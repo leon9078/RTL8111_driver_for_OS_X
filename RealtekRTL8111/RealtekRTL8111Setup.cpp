@@ -313,7 +313,7 @@ bool RTL8111::setupRxResources()
 
     /* Alloc receive buffers. */
     for (i = 0; i < kNumRxDesc; i++) {
-        m = rxPool->getPacket(kRxBufferSize);
+        m = rxPool->getPacket(kRxBufferSize, MBUF_WAITOK);
         
         if (!m) {
             IOLog("Couldn't get receive buffer from pool.\n");
