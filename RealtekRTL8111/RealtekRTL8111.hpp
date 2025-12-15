@@ -398,6 +398,13 @@ private:
     /* RTL8111B/8168B specific methods */
     void timerActionRTL8111B(IOTimerEventSource *timer);
     
+    /* Set wolActive prior to shutdown or restart to support WoL from S5
+     * if "Wake for network access" ("womp" pmset setting) is enabled or rtl8111-wol-override=1
+     * is set via boot-args and run the hardware
+     * enable/disable routines if the controller is already disabled.
+     */
+    void setWakeOnLanFromShutdown();
+
 private:
 	IOWorkLoop *workLoop;
     IOCommandGate *commandGate;
@@ -494,6 +501,8 @@ private:
     bool needsUpdate;
     bool wolCapable;
     bool wolActive;
+    bool wolPwrOff;
+    bool rtl8111woloverride;
     bool revisionC;
     bool enableTSO4;
     bool enableTSO6;

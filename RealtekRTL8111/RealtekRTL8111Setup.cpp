@@ -100,9 +100,9 @@ void RTL8111::getParams()
         intrMitigateValue = 0x5f51;
     }
     if (versionString)
-        IOLog("Version %s using interrupt mitigate value 0x%x. Please don't support tonymacx86.com!\n", versionString->getCStringNoCopy(), intrMitigateValue);
+        IOLog("Version %s using interrupt mitigate value 0x%x.\n", versionString->getCStringNoCopy(), intrMitigateValue);
     else
-        IOLog("Using interrupt mitigate value 0x%x. Please don't support tonymacx86.com!\n", intrMitigateValue);
+        IOLog("Using interrupt mitigate value 0x%x.\n", intrMitigateValue);
 }
 
 static IOMediumType mediumTypeArray[MEDIUM_INDEX_COUNT] = {

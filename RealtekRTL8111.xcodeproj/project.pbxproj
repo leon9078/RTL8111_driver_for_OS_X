@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D3152F9A2D52DBFB001D6C0F /* libkmod.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3667CAC2D46C92800F47BA2 /* libkmod.a */; };
+		A72CFFE22EF00AEF003E151C /* libkmod.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A72CFFE12EF00AE2003E151C /* libkmod.a */; };
 		D334569B2ED7876B0020D001 /* RealtekRxPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D33456992ED7876B0020D001 /* RealtekRxPool.hpp */; };
 		D334569C2ED7876B0020D001 /* RealtekRxPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D334569A2ED7876B0020D001 /* RealtekRxPool.cpp */; };
 		D33456A22ED788E40020D001 /* RealtekRTL8111VTD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D33456A12ED788E40020D001 /* RealtekRTL8111VTD.cpp */; };
@@ -42,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A72CFFE12EF00AE2003E151C /* libkmod.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkmod.a; path = usr/lib/libkmod.a; sourceTree = SDKROOT; };
 		D31CAE4E2531DFE700A11416 /* RealtekRTL8111.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealtekRTL8111.hpp; sourceTree = "<group>"; };
 		D33456992ED7876B0020D001 /* RealtekRxPool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealtekRxPool.hpp; sourceTree = "<group>"; };
 		D334569A2ED7876B0020D001 /* RealtekRxPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RealtekRxPool.cpp; sourceTree = "<group>"; };
@@ -1300,7 +1301,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3152F9A2D52DBFB001D6C0F /* libkmod.a in Frameworks */,
+				A72CFFE22EF00AEF003E151C /* libkmod.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3529,6 +3530,7 @@
 		D37BD68116C605F500C255A2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A72CFFE12EF00AE2003E151C /* libkmod.a */,
 				D36677602D46C91E00F47BA2 /* MacKernelSDK */,
 			);
 			name = Frameworks;
@@ -3564,6 +3566,7 @@
 				D36681812D46CA8D00F47BA2 /* Sources */,
 				D36681822D46CA8D00F47BA2 /* Frameworks */,
 				D36681832D46CA8D00F47BA2 /* Resources */,
+				A72CFFE32EF00B03003E151C /* Archive */,
 			);
 			buildRules = (
 			);
@@ -3647,6 +3650,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A72CFFE32EF00B03003E151C /* Archive */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Archive;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"${TARGET_BUILD_DIR}\"\n\ndist=(\"$FULL_PRODUCT_NAME\")\nif [ -d \"$DWARF_DSYM_FILE_NAME\" ]; then dist+=(\"$DWARF_DSYM_FILE_NAME\"); fi\n\narchive=\"${PRODUCT_NAME}-${MODULE_VERSION}-$(echo $CONFIGURATION | tr /a-z/ /A-Z/).zip\"\nrm -rf *.zip\nfind * -maxdepth 0 -name \"*.dSYM\" -exec sh -c 'mv \"$1\" \"${1%.dSYM}_dSYM\"' _ {} \\;\nfind * -print0 | xargs -0 ls -pd1 | sort | perl -pe \"s/_dSYM/.dSYM/\" | tee in.txt\nfind * -maxdepth 0 -name \"*_dSYM\" -exec sh -c 'mv \"$1\" \"${1%_dSYM}.dSYM\"' _ {} \\;\nfind . -exec touch -m \"{}\" \"+\"\nzip -@ \"${archive}\" < in.txt\nrm in.txt\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D36681812D46CA8D00F47BA2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -3681,11 +3705,11 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3.0.4;
+				CURRENT_PROJECT_VERSION = 3.0.5;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FZX87E5QBD;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREFIX_HEADER = "RealtekRTL8111/RealtekRTL8111-V2-Prefix.pch";
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -3696,7 +3720,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2013 Laura Müller. All rights reserved.";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.5;
 				MODULE_NAME = com.insanelymac.RealtekRTL8111;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
@@ -3730,11 +3754,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3.0.4;
+				CURRENT_PROJECT_VERSION = 3.0.5;
 				DEVELOPMENT_TEAM = FZX87E5QBD;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
 				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREFIX_HEADER = "RealtekRTL8111/RealtekRTL8111-V2-Prefix.pch";
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -3745,7 +3769,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2013 Laura Müller. All rights reserved.";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.5;
 				MODULE_NAME = com.insanelymac.RealtekRTL8111;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
@@ -3799,7 +3823,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -3865,7 +3889,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;

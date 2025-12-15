@@ -92,6 +92,8 @@ bool RTL8111::init(OSDictionary *properties)
         lastIntrTime = 0;
         wolCapable = false;
         wolActive = false;
+        wolPwrOff = false;
+        rtl8111woloverride = false;
         enableTSO4 = false;
         enableTSO6 = false;
         enableCSO6 = false;
@@ -226,6 +228,9 @@ bool RTL8111::start(IOService *provider)
         IOLog("attachInterface() failed.\n");
         goto error_src;
     }
+    if (PE_parse_boot_argn("rtl8111-wol-override", &rtl8111woloverride, sizeof(rtl8111woloverride))) {
+        wolPwrOff = true;
+    }
     pciDevice->close(this);
     result = true;
     
@@ -344,6 +349,7 @@ void RTL8111::systemWillShutdown(IOOptionBits specifier)
     DebugLog("systemWillShutdown() ===>\n");
     
     if ((kIOMessageSystemWillPowerOff | kIOMessageSystemWillRestart) & specifier) {
+        setWakeOnLanFromShutdown();
         disable(netif);
         
         /* Restore the original MAC address. */
@@ -819,6 +825,39 @@ IOReturn RTL8111::setWakeOnMagicPacket(bool active)
     DebugLog("setWakeOnMagicPacket() <===\n");
 
     return result;
+}
+
+void RTL8111::setWakeOnLanFromShutdown()
+{
+    DebugLog("setWakeOnLanFromShutdown() ===>\n");
+
+    if (wolCapable) {
+        if (!wolPwrOff) {
+            unsigned long wakeSetting = 0;
+
+            getAggressiveness(kPMEthernetWakeOnLANSettings, &wakeSetting);
+
+            if (kIOEthernetWakeOnMagicPacket & wakeSetting) {
+                wolActive = true;
+                DebugLog("Wake on magic packet enabled.\n");
+            }
+            if (!isEnabled && wolActive) {
+                enableRTL8111();
+                disableRTL8111();
+                DebugLog("Wake on LAN from shutdown active.\n");
+            }
+        } else {
+            wolActive = rtl8111woloverride;
+            DebugLog("Wake on magic packet %s.\n", wolActive ? "enabled" : "disabled");
+            if (!isEnabled && wolActive) {
+                enableRTL8111();
+                disableRTL8111();
+                DebugLog("Wake on LAN from shutdown active.\n");
+            }
+        }
+    }
+
+    DebugLog("setWakeOnLanFromShutdown() <===\n");
 }
 
 IOReturn RTL8111::getPacketFilters(const OSSymbol *group, UInt32 *filters) const
