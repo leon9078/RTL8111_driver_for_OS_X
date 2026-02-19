@@ -90,6 +90,8 @@ bool RTL8111::init(OSDictionary *properties)
         lastIntrTime = 0;
         wolCapable = false;
         wolActive = false;
+        wolPwrOff = false;
+        rtl8111woloverride = false;
         enableTSO4 = false;
         enableTSO6 = false;
         enableCSO6 = false;
@@ -206,6 +208,9 @@ bool RTL8111::start(IOService *provider)
         IOLog("[RealtekRTL8111]: attachInterface() failed.\n");
         goto error4;
     }
+    if (PE_parse_boot_argn("rtl8111-wol-override", &rtl8111woloverride, sizeof(rtl8111woloverride))) {
+        wolPwrOff = true;
+    }
     pciDevice->close(this);
     result = true;
     
@@ -312,6 +317,7 @@ void RTL8111::systemWillShutdown(IOOptionBits specifier)
     DebugLog("systemWillShutdown() ===>\n");
     
     if ((kIOMessageSystemWillPowerOff | kIOMessageSystemWillRestart) & specifier) {
+        setWakeOnLanFromShutdown();
         disable(netif);
         
         /* Restore the original MAC address. */
@@ -895,6 +901,39 @@ IOReturn RTL8111::setWakeOnMagicPacket(bool active)
     return result;
 }
 
+void RTL8111::setWakeOnLanFromShutdown()
+{
+    DebugLog("setWakeOnLanFromShutdown() ===>\n");
+
+    if (wolCapable) {
+        if (!wolPwrOff) {
+            unsigned long wakeSetting = 0;
+
+            getAggressiveness(kPMEthernetWakeOnLANSettings, &wakeSetting);
+
+            if (kIOEthernetWakeOnMagicPacket & wakeSetting) {
+                wolActive = true;
+                DebugLog("[RealtekRTL8111]: Wake on magic packet enabled.\n");
+            }
+            if (!isEnabled && wolActive) {
+                enableRTL8111();
+                disableRTL8111();
+                DebugLog("[RealtekRTL8111]: Wake on LAN from shutdown active.\n");
+            }
+        } else {
+            wolActive = rtl8111woloverride;
+            DebugLog("[RealtekRTL8111]: Wake on magic packet %s.\n", wolActive ? "enabled" : "disabled");
+            if (!isEnabled && wolActive) {
+                enableRTL8111();
+                disableRTL8111();
+                DebugLog("[RealtekRTL8111]: Wake on LAN from shutdown active.\n");
+            }
+        }
+    }
+
+    DebugLog("setWakeOnLanFromShutdown() <===\n");
+}
+
 IOReturn RTL8111::getPacketFilters(const OSSymbol *group, UInt32 *filters) const
 {
     IOReturn result = kIOReturnSuccess;
@@ -1160,9 +1199,9 @@ void RTL8111::getParams()
         intrMitigateValue = 0x5f51;
     }
     if (versionString)
-        IOLog("[RealtekRTL8111]: Version %s using interrupt mitigate value 0x%x. Please don't support tonymacx86.com!\n", versionString->getCStringNoCopy(), intrMitigateValue);
+        IOLog("[RealtekRTL8111]: Version %s using interrupt mitigate value 0x%x.\n", versionString->getCStringNoCopy(), intrMitigateValue);
     else
-        IOLog("[RealtekRTL8111]: Using interrupt mitigate value 0x%x. Please don't support tonymacx86.com!\n", intrMitigateValue);
+        IOLog("[RealtekRTL8111]: Using interrupt mitigate value 0x%x.\n", intrMitigateValue);
 }
 
 static IOMediumType mediumTypeArray[MEDIUM_INDEX_COUNT] = {

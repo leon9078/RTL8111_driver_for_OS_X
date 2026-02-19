@@ -151,6 +151,7 @@
 				D34D36B91AD2F62B00EEEC08 /* Headers */,
 				D34D36BE1AD2F62B00EEEC08 /* Resources */,
 				D34D36C01AD2F62B00EEEC08 /* Rez */,
+				9A6557722F43BFF9001295BB /* Archive */,
 			);
 			buildRules = (
 			);
@@ -209,6 +210,27 @@
 		};
 /* End PBXRezBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		9A6557722F43BFF9001295BB /* Archive */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Archive;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"${TARGET_BUILD_DIR}\"\n\ndist=(\"$FULL_PRODUCT_NAME\")\nif [ -d \"$DWARF_DSYM_FILE_NAME\" ]; then dist+=(\"$DWARF_DSYM_FILE_NAME\"); fi\n\narchive=\"${PRODUCT_NAME}-${MODULE_VERSION}-$(echo $CONFIGURATION | tr /a-z/ /A-Z/).zip\"\nrm -rf *.zip\nfind * -maxdepth 0 -name \"*.dSYM\" -exec sh -c 'mv \"$1\" \"${1%.dSYM}_dSYM\"' _ {} \\;\nfind * -print0 | xargs -0 ls -pd1 | sort | perl -pe \"s/_dSYM/.dSYM/\" | tee in.txt\nfind * -maxdepth 0 -name \"*_dSYM\" -exec sh -c 'mv \"$1\" \"${1%_dSYM}.dSYM\"' _ {} \\;\nfind . -exec touch -m \"{}\" \"+\"\nzip -@ \"${archive}\" < in.txt\nrm in.txt\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D34D36B51AD2F62B00EEEC08 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -255,7 +277,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = "$(MODULE_VERSION)";
 				MODULE_NAME = com.insanelymac.RealtekRTL8111;
-				MODULE_VERSION = 2.4.2d0;
+				MODULE_VERSION = 2.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.insanelymac.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RealtekRTL8111;
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -285,7 +307,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = "$(MODULE_VERSION)";
 				MODULE_NAME = com.insanelymac.RealtekRTL8111;
-				MODULE_VERSION = 2.4.2d0;
+				MODULE_VERSION = 2.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.insanelymac.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RealtekRTL8111;
 				SDKROOT = macosx;
